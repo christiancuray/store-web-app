@@ -1,76 +1,27 @@
+/*********************************************************************************
+WEB322 – Assignment 02
+I declare that this assignment is my own work in accordance with Seneca Academic Policy.  
+No part of this assignment has been copied manually or electronically from any other source (including 3rd party web sites) or distributed to other students.
+
+Name: Christian Daryl Curay
+Student ID: 122375231
+Date: October 8, 2024
+Vercel Web App URL: 
+GitHub Repository URL: https://github.com/christiancuray/web-app
+
+********************************************************************************/
 const express = require("express");
 const path = require("path");
 const app = express();
 const fs = require("fs");
 const port = process.env.PORT || 8080;
-
 const storeService = require("./store-service");
+
+// to serve static files from public directory
 app.use(express.static("public"));
-/*
-app.get("/", (req, res) => {
-  res.redirect("/about");
-});
 
-app.get("/about", (req, res) => {
-  res.sendFile(path.join(__dirname, "views", "about.html"));
-});
-
-/*
-app.get("/shop", (req, res) => {
-  res.send("TODO: get all items who have published==true");
-});
-
-const dataFilePath = path.join(__dirname, "data", "items.json");
-const categoriesFilePath = path.join(__dirname, "data", "categories.json");
-app.get("/shop", (req, res) => {
-  fs.readFile(dataFilePath, "utf8", (err, data) => {
-    if (err) {
-      console.error("Error reading the JSON file:", err);
-      return res.status(404).send("Page not found");
-    }
-
-    // Parse the JSON data
-    const items = JSON.parse(data);
-
-    // Filter the items to return only those with published set to true
-    const publishedItems = items.filter((item) => (item.published = true));
-
-    // Send the filtered items as JSON
-    res.json(publishedItems);
-  });
-});
-
-app.get("/items", (req, res) => {
-  fs.readFile(dataFilePath, "utf8", (err, data) => {
-    if (err) {
-      console.error("Error reading the JSON file:", err);
-      return res.status(404).send("Page not found");
-    }
-
-    // Parse the JSON data
-    const items = JSON.parse(data);
-
-    // Send the items as JSON
-    res.json(items);
-  });
-});
-
-app.get("/categories", (req, res) => {
-  fs.readFile(categoriesFilePath, "utf8", (err, categories) => {
-    if (err) {
-      console.error("Error reading the JSON file:", err);
-      return res.status(404).send("Page not found");
-    }
-
-    // Parse the JSON data
-    const categoriesData = JSON.parse(categories);
-
-    // Send the categories as JSON
-    res.json(categoriesData);
-  });
-});
-*/
-
+// call initialize function from store-service.js to
+// read the data from the items.json and categories.json files
 storeService
   .initialize()
   .then((message) => {
@@ -99,7 +50,6 @@ app.get("/shop", (req, res) => {
     })
     .catch((error) => {
       console.error("Error getting published items:", error);
-      res.status(500).send("Internal Server Error");
     });
 });
 
@@ -112,7 +62,6 @@ app.get("/items", (req, res) => {
     })
     .catch((error) => {
       console.error("Error getting all items:", error);
-      res.status(500).send("Internal Server Error");
     });
 });
 
@@ -125,9 +74,15 @@ app.get("/categories", (req, res) => {
     })
     .catch((error) => {
       console.error("Error getting categories:", error);
-      res.status(500).send("Internal Server Error");
     });
 });
+
+// route to handle when trying to access a page that does not exist
+app.use((req, res) => {
+  res.status(404).send("Page Not Found");
+});
+
+// starts the server
 app.listen(port, () => {
   console.log(`Express html server listening on http://localhost:${port}`);
 });

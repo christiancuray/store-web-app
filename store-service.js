@@ -1,6 +1,7 @@
 const fs = require("fs");
 const path = require("path");
 
+// variables to store the data from the items.json and categories.json files
 let items = [];
 let categories = [];
 
@@ -14,7 +15,7 @@ let initialize = () => {
         if (err) {
           reject("Unable to read items.json");
         }
-
+        // parse the data from the items.json file
         items = JSON.parse(dataI);
 
         fs.readFile(
@@ -25,6 +26,7 @@ let initialize = () => {
               reject("Unable to read categories.json");
             }
 
+            // parse the data from the categories.json file
             categories = JSON.parse(dataC);
 
             resolve("Initialization success!");
@@ -51,6 +53,7 @@ let getPublishedItems = () => {
     if (items.length === 0) {
       reject("No results returned");
     }
+    // filter the items that have published set to true
     resolve(items.filter((item) => item.published === true));
   });
 };
@@ -65,6 +68,7 @@ let getCategories = () => {
   });
 };
 
+// export the functions to be used in the server.js
 module.exports = {
   initialize,
   getAllItems,
