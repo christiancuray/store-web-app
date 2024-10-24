@@ -16,9 +16,15 @@ const app = express();
 const fs = require("fs");
 const port = process.env.PORT || 8080;
 const storeService = require("./store-service");
+// explicitly require the "pg" module for Sequelize
+require("pg");
+const Sequelize = require("sequelize");
+
+// set up view engine to render EJS templates
+app.set("views", __dirname + "/views");
 
 // to serve static files from public directory
-app.use(express.static("public"));
+app.use(express.static(__dirname + "/public"));
 
 // call initialize function from store-service.js to
 // read the data from the items.json and categories.json files
