@@ -6,7 +6,7 @@ No part of this assignment has been copied manually or electronically from any o
 Name: Christian Daryl Curay
 Student ID: 122375231
 Date: October 8, 2024
-Vercel Web App URL: 
+Vercel Web App URL: https://web-application-three-pi.vercel.app
 GitHub Repository URL: https://github.com/christiancuray/web-app
 
 ********************************************************************************/
