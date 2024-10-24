@@ -16,7 +16,11 @@ let initialize = () => {
           reject("Unable to read items.json");
         }
         // parse the data from the items.json file
-        items = JSON.parse(dataI);
+        try {
+          items = JSON.parse(dataI);
+        } catch (e) {
+          console.error("Error parsing JSON:", e);
+        }
 
         fs.readFile(
           path.join(__dirname, "data", "categories.json"),
@@ -27,8 +31,11 @@ let initialize = () => {
             }
 
             // parse the data from the categories.json file
-            categories = JSON.parse(dataC);
-
+            try {
+              categories = JSON.parse(dataC);
+            } catch (e) {
+              console.error("Error parsing JSON:", e);
+            }
             resolve("Initialization success!");
           }
         );
