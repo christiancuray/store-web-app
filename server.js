@@ -16,9 +16,6 @@ const app = express();
 const fs = require("fs");
 const port = process.env.PORT || 8080;
 const storeService = require("./store-service");
-// explicitly require the "pg" module for Sequelize
-require("pg");
-const Sequelize = require("sequelize");
 
 // set up view engine to render EJS templates
 app.set("views", __dirname + "/views");
