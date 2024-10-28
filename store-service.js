@@ -75,10 +75,72 @@ let getCategories = () => {
   });
 };
 
+// function that let the user add item to the items collection
+let addItem = (itemData) => {
+  return new Promise((resolve, reject) => {
+    // check if the itemData has a published property
+    if (itemData.published === undefined) {
+      itemData.published = false;
+    } else {
+      itemData.published = true;
+    }
+    // generate item id for new item
+    itemData.id = items.length + 1;
+
+    // add the news item to the items array
+    items.push(itemData);
+
+    resolve(itemData);
+  });
+};
+
+// function that returns items that belong to the provided category
+let getItemsByCategory = (category) => {
+  return new Promise((resolve, reject) => {
+    if (category.length === 0) {
+      reject("No results returned");
+    } else {
+      // filter the items that belong to the provided category
+      resolve(items.filter((item) => item.id === category));
+    }
+  });
+};
+
+// function that returns items that have a date greater than or equal to the provided date
+let getItemsByMinDate = (minDate) => {
+  return new Promise((resolve, reject) => {
+    if (minDate.length === 0) {
+      reject("No results returned");
+    } else {
+      // convert minDate to Date object
+      minDate = new Date(minDate);
+
+      // filter the items that have a date greater than or equal to the provided date
+      resolve(items.filter((item) => new Date(item.date) >= minDate));
+    }
+  });
+};
+
+// function that returns item that have the provided id
+let getItemById = (id) => {
+  return new Promise((resolve, reject) => {
+    if (id.length === 0) {
+      reject("No results returned");
+    } else {
+      // filter the items that have the provided id
+      resolve(items.filter((item) => item.id === id));
+    }
+  });
+};
+
 // export the functions to be used in the server.js
 module.exports = {
   initialize,
   getAllItems,
   getPublishedItems,
   getCategories,
+  addItem,
+  getItemsByCategory,
+  getItemsByMinDate,
+  getItemById,
 };
