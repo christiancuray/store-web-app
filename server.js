@@ -145,10 +145,11 @@ app.get("/shop", async (req, res) => {
   try {
     // Obtain the full list of "categories"
     let categories = await storeService.getCategories();
-
+    console.log(categories);
     // store the "categories" data in the viewData object (to be passed to the view)
     viewData.categories = categories;
   } catch (err) {
+    console.error("Error fetching categories:", err);
     viewData.categoriesMessage = "no results";
   }
 
@@ -195,13 +196,13 @@ app.get("/shop/:id", async (req, res) => {
   try {
     // Obtain the full list of "categories"
     let categories = await storeService.getCategories();
-
+    console.log(categories);
     // store the "categories" data in the viewData object (to be passed to the view)
     viewData.categories = categories;
   } catch (err) {
+    console.error("Error fetching categories:", err);
     viewData.categoriesMessage = "no results";
   }
-
   // render the "shop" view with all of the data (viewData)
   res.render("shop", { data: viewData });
 });
