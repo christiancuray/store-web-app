@@ -117,7 +117,6 @@ app.get("/shop", async (req, res) => {
   try {
     // declare empty array to hold "item" objects
     let items = [];
-    let categories = [];
 
     // if there's a "category" query, filter the returned items by category
     if (req.query.category) {
@@ -166,7 +165,6 @@ app.get("/shop/:id", async (req, res) => {
   try {
     // declare empty array to hold "item" objects
     let items = [];
-    let categories = [];
 
     // if there's a "category" query, filter the returned items by category
     if (req.query.category) {
