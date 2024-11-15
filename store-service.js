@@ -68,7 +68,7 @@ let getPublishedItems = () => {
 // function that returns all categories
 let getCategories = () => {
   return new Promise((resolve, reject) => {
-    if (categories.length === 0) {
+    if (!categories) {
       reject("No results returned");
     }
     resolve(categories);
