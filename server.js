@@ -71,6 +71,7 @@ const hbs = exphbs.create({
 // Use the hbs instance with helpers
 app.engine(".hbs", hbs.engine);
 // Set the view engine to use handlebars
+app.set("views", path.join(__dirname, "views"));
 app.set("view engine", ".hbs");
 
 // to serve static files from public directory
@@ -99,7 +100,7 @@ app.use(function (req, res, next) {
   next();
 });
 
-// route to redirect to about page
+// route to redirect to shop page
 app.get("/", (req, res) => {
   res.redirect("/shop");
 });
