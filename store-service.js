@@ -87,6 +87,16 @@ let addItem = (itemData) => {
     // generate item id for new item
     itemData.id = items.length + 1;
 
+    // Add the current date (formatted as YYYY-MM-DD) as itemDte
+    const currentDate = new Date();
+    const formattedDate =
+      currentDate.getFullYear() +
+      "-" +
+      (currentDate.getMonth() + 1) +
+      "-" +
+      currentDate.getDate(); // YYYY-MM-DD format
+    itemData.itemDte = formattedDate;
+
     // add the news item to the items array
     items.push(itemData);
 
@@ -97,11 +107,11 @@ let addItem = (itemData) => {
 // function that returns items that belong to the provided category
 let getItemsByCategory = (category) => {
   return new Promise((resolve, reject) => {
-    if (category.length === 0) {
+    if (!category) {
       reject("No results returned");
     } else {
-      // filter the items that belong to the provided category
-      resolve(items.filter((item) => item.id === category));
+      // Filter the items that belong to the provided category
+      resolve(items.filter((item) => item.category === Number(category)));
     }
   });
 };
@@ -133,6 +143,20 @@ let getItemById = (id) => {
   });
 };
 
+let getPublishedItemsByCategory = (category) => {
+  return new Promise((resolve, reject) => {
+    if (items.length === 0) {
+      reject("No results returned");
+    }
+    // filter the items that have published set to true and belong to the provided category
+    resolve(
+      items.filter(
+        (item) => item.published === true && item.category === category
+      )
+    );
+  });
+};
+
 // export the functions to be used in the server.js
 module.exports = {
   initialize,
@@ -143,4 +167,5 @@ module.exports = {
   getItemsByCategory,
   getItemsByMinDate,
   getItemById,
+  getPublishedItemsByCategory,
 };
