@@ -32,8 +32,8 @@ let initialize = () => {
 let getAllItems = () => {
   return new Promise((resolve, reject) => {
     Item.findAll()
-      .then(() => {
-        resolve(Item);
+      .then((items) => {
+        resolve(items);
       })
       .catch((err) => {
         reject("No result returned");
@@ -58,8 +58,8 @@ let getPublishedItems = () => {
 let getCategories = () => {
   return new Promise((resolve, reject) => {
     Category.findAll()
-      .then(() => {
-        resolve(Category);
+      .then((categories) => {
+        resolve(categories);
       })
       .catch((err) => {
         reject("No result returned");
@@ -116,7 +116,7 @@ let getItemsByMinDate = (minDate) => {
     Item.findAll({
       where: {
         itemDate: {
-          [gte]: new Date(minDate),
+          [Op.gte]: new Date(minDate),
         },
       },
     })
@@ -132,7 +132,7 @@ let getItemsByMinDate = (minDate) => {
 // function that returns item that have the provided id
 let getItemById = (id) => {
   return new Promise((resolve, reject) => {
-    Item.findaAll({ where: { id: id } })
+    Item.findAll({ where: { id: id } })
       .then((items) => {
         resolve(items[0]);
       })
@@ -159,9 +159,9 @@ let getPublishedItemsByCategory = (category) => {
 let addCategory = (categoryData) => {
   return new Promise((resolve, reject) => {
     // set the blank values into null values
-    for (const val in itemData) {
-      if (itemData[val] === "") {
-        itemData[val] = null;
+    for (const val in categoryData) {
+      if (categoryData[val] === "") {
+        categoryData[val] = null;
       }
     }
 

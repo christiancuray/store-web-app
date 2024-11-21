@@ -409,6 +409,11 @@ app.use((req, res) => {
   res.status(404).render("404");
 });
 
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(500).send("Something went wrong!");
+});
+
 // starts the server
 app.listen(port, () => {
   console.log(`Express html server listening on http://localhost:${port}`);
