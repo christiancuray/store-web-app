@@ -1,5 +1,5 @@
 /*********************************************************************************
-WEB322 – Assignment 04
+WEB322 – Assignment 05
 I declare that this assignment is my own work in accordance with Seneca Academic Policy.  
 No part of this assignment has been copied manually or electronically from any other source (including 3rd party web sites) or distributed to other students.
 
@@ -64,6 +64,12 @@ const hbs = exphbs.create({
     },
     safeHTML: function (context) {
       return stripJs(context);
+    },
+    formatDate: function (dateObj) {
+      let year = dateObj.getFullYear();
+      let month = (dateObj.getMonth() + 1).toString();
+      let day = dateObj.getDate().toString();
+      return `${year}-${month.padStart(2, "0")}-${day.padStart(2, "0")}`;
     },
   },
 });
@@ -217,7 +223,11 @@ app.get("/items", (req, res) => {
       .getItemsByCategory(category)
       .then((items) => {
         //return items in JSON format
-        res.render("items", { items: items });
+        if (items.length > 0) {
+          res.render("items", { items: items });
+        } else {
+          res.render("items", { message: "No results" });
+        }
       })
       .catch((error) => {
         console.error("Error getting items by category:", error);
@@ -230,7 +240,11 @@ app.get("/items", (req, res) => {
       .getItemsByMinDate(req.query.minDate)
       .then((items) => {
         //return items in JSON format
-        res.render("items", { items: items });
+        if (items.length > 0) {
+          res.render("items", { items: items });
+        } else {
+          res.render("items", { message: "No results" });
+        }
       })
       .catch((error) => {
         console.error("Error getting items by minDate:", error);
@@ -241,8 +255,12 @@ app.get("/items", (req, res) => {
   storeService
     .getAllItems()
     .then((items) => {
-      //return items in JSON format
-      res.render("items", { items: items });
+      // render all items in JSON format
+      if (items.length > 0) {
+        res.render("items", { items: items });
+      } else {
+        res.render("items", { message: "No results" });
+      }
     })
     .catch((error) => {
       console.error("Error getting items by category:", error);
@@ -254,8 +272,12 @@ app.get("/items", (req, res) => {
 app.get("/categories", (req, res) => {
   storeService
     .getCategories()
-    .then((categories) => {
-      res.render("categories", { categories: categories });
+    .then((cat) => {
+      if (cat.length > 0) {
+        res.render("categories", { categories: cat });
+      } else {
+        res.render("categories", { message: "No results" });
+      }
     })
     .catch((error) => {
       console.error("Error getting categories:", error);
@@ -265,7 +287,14 @@ app.get("/categories", (req, res) => {
 
 // route to get the add item form
 app.get("/items/add", (req, res) => {
-  res.render("addItem");
+  storeService
+    .getCategories()
+    .then((data) => {
+      res.render("addItem", { categories: data });
+    })
+    .catch((error) => {
+      res.render("addItem", { categories: [] });
+    });
 });
 
 // route that handles the form submission
@@ -331,6 +360,47 @@ app.get("/item/value", (req, res) => {
     .catch((error) => {
       console.error("Error getting item by id:", error);
       res.status(500).send({ message: "Error getting item by id" });
+    });
+});
+
+// route to get the add category form
+app.get("/categories/add", (req, res) => {
+  res.render("addCategory");
+});
+
+// route that handles the form submission
+app.post("/categories/add", (req, res) => {
+  storeService
+    .addCategory(req.body)
+    .then(() => {
+      res.redirect("/categories");
+    })
+    .catch((error) => {
+      res.status(500).send("Error adding category");
+    });
+});
+
+// route to get the delete category by ID
+app.get("/categories/delete/:id", (req, res) => {
+  storeService
+    .deleteCategoryById(req.params.id)
+    .then(() => {
+      res.redirect("/categories");
+    })
+    .catch((error) => {
+      res.status(500).send("Unable to Remove Category / Category not found");
+    });
+});
+
+// route to get the delete item by ID
+app.get("/items/delete/:id", (req, res) => {
+  storeService
+    .deleteItemById(req.params.id)
+    .then(() => {
+      res.redirect("/items");
+    })
+    .catch((error) => {
+      res.status(500).send("Unable to Remove Item / Item not found");
     });
 });
 
