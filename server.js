@@ -405,9 +405,9 @@ app.get("/items/delete/:id", (req, res) => {
 });
 
 // route to handle when trying to access a page that does not exist
-app.use((req, res) => {
-  res.status(404).render("404");
-});
+// app.use((req, res) => {
+//   res.status(404).render("404");
+// });
 
 app.use((err, req, res, next) => {
   console.error(err.stack);
