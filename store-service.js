@@ -1,5 +1,4 @@
 const Sequelize = require("sequelize");
-require("dotenv").config();
 
 // connect to the database
 const sequelize = new Sequelize("SenecaDB", "SenecaDB_owner", "Cv75rieDxWkg", {
