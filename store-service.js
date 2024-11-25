@@ -1,15 +1,34 @@
 const Sequelize = require("sequelize");
+const { Op } = require("sequelize");
 
 // connect to the database
-const sequelize = new Sequelize("SenecaDB", "SenecaDB_owner", "Cv75rieDxWkg", {
-  host: "ep-empty-shape-a5lkblz0.us-east-2.aws.neon.tech",
-  dialect: "postgres",
-  port: 5432,
-  dialectOptions: {
-    ssl: { rejectUnauthorized: false },
-  },
-  query: { raw: true },
-});
+// const sequelize = new Sequelize("SenecaDB", "SenecaDB_owner", "Cv75rieDxWkg", {
+//   host: "ep-empty-shape-a5lkblz0.us-east-2.aws.neon.tech",
+//   dialect: "postgres",
+//   port: 5432,
+//   dialectOptions: {
+//     ssl: { rejectUnauthorized: false },
+//   },
+//   query: { raw: true },
+// });
+const sequelize = new Sequelize(
+  process.env.DATABASE_NAME || "SenecaDB",
+  process.env.DATABASE_USER || "SenecaDB_owner",
+  process.env.DATABASE_PASSWORD || "Cv75rieDxWkg",
+  {
+    host:
+      process.env.DATABASE_HOST ||
+      "ep-empty-shape-a5lkblz0.us-east-2.aws.neon.tech",
+    dialect: "postgres",
+    port: process.env.DATABASE_PORT || 5432,
+    dialectOptions: {
+      ssl: {
+        rejectUnauthorized: false,
+      },
+    },
+    query: { raw: true },
+  }
+);
 
 const Item = sequelize.define("Item", {
   body: Sequelize.TEXT,
@@ -59,8 +78,8 @@ let getAllItems = () => {
 let getPublishedItems = () => {
   return new Promise((resolve, reject) => {
     Item.findAll({ where: { published: true } })
-      .then(() => {
-        resolve(Item);
+      .then((items) => {
+        resolve(items);
       })
       .catch((err) => {
         reject("No result returned");
@@ -129,7 +148,7 @@ let getItemsByCategory = (category) => {
 // function that returns items that have a date greater than or equal to the provided date
 let getItemsByMinDate = (minDate) => {
   return new Promise((resolve, reject) => {
-    const { gte } = Sequelize.Op;
+    const { Op } = Sequelize;
 
     Item.findAll({
       where: {
