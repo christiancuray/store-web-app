@@ -1,19 +1,16 @@
 const Sequelize = require("sequelize");
+require("dotenv").config();
 
 // connect to the database
-var sequelize = new Sequelize(
-  // "postgresql://SenecaDB_owner:Cv75rieDxWkg@ep-empty-shape-a5lkblz0.us-east-2.aws.neon.tech/SenecaDB?sslmode=require",
-  process.env.DATABASE_URL,
-  {
-    host: "host",
-    dialect: "postgres",
-    port: 5432,
-    dialectOptions: {
-      ssl: { rejectUnauthorized: false },
-    },
-    query: { raw: true },
-  }
-);
+const sequelize = new Sequelize("SenecaDB", "SenecaDB_owner", "Cv75rieDxWkg", {
+  host: "ep-empty-shape-a5lkblz0.us-east-2.aws.neon.tech",
+  dialect: "postgres",
+  port: 5432,
+  dialectOptions: {
+    ssl: { rejectUnauthorized: false },
+  },
+  query: { raw: true },
+});
 
 const Item = sequelize.define("Item", {
   body: Sequelize.TEXT,
