@@ -2,7 +2,8 @@ const Sequelize = require("sequelize");
 
 // connect to the database
 var sequelize = new Sequelize(
-  "postgresql://SenecaDB_owner:Cv75rieDxWkg@ep-empty-shape-a5lkblz0.us-east-2.aws.neon.tech/SenecaDB?sslmode=require",
+  // "postgresql://SenecaDB_owner:Cv75rieDxWkg@ep-empty-shape-a5lkblz0.us-east-2.aws.neon.tech/SenecaDB?sslmode=require",
+  process.env.DATABASE_URL,
   {
     host: "host",
     dialect: "postgres",
