@@ -14,6 +14,23 @@ var sequelize = new Sequelize(
   }
 );
 
+const Item = sequelize.define("Item", {
+  body: Sequelize.TEXT,
+  title: Sequelize.STRING,
+  itemDate: Sequelize.DATE,
+  featureImage: Sequelize.STRING,
+  published: Sequelize.BOOLEAN,
+  price: Sequelize.DOUBLE,
+});
+
+const Category = sequelize.define("Category", {
+  category: Sequelize.STRING,
+});
+
+// create a relationship between Item and Category
+Item.belongsTo(Category, { foreignKey: "category" });
+Category.hasMany(Item, { foreignKey: "category" });
+
 // function that reads the data from the items.json and categories.json files
 let initialize = () => {
   return new Promise((resolve, reject) => {
@@ -70,20 +87,24 @@ let getCategories = () => {
 // function that let the user add item to the items collection
 let addItem = (itemData) => {
   return new Promise((resolve, reject) => {
-    // Set the "published" property explicitly to true or false
-    itemData.published = itemData.published ? true : false;
-
-    // Set the blank values into null values
+    // set the blank values into null values
     for (const val in itemData) {
       if (itemData[val] === "") {
         itemData[val] = null;
       }
     }
-    // Set the itemDate to the current date
+
     itemData.itemDate = new Date();
 
-    // create Item
-    Item.create(itemData)
+    Item.create({
+      title: itemData.title,
+      body: itemData.body,
+      itemDate: itemData.itemDate,
+      featureImage: itemData.featureImage,
+      published: itemData.published,
+      price: itemData.price,
+      category: itemData.category,
+    })
       .then(() => {
         resolve("Item added successfully");
       })
@@ -158,15 +179,13 @@ let getPublishedItemsByCategory = (category) => {
 // function that add category to the categories collection
 let addCategory = (categoryData) => {
   return new Promise((resolve, reject) => {
-    // set the blank values into null values
     for (const val in categoryData) {
       if (categoryData[val] === "") {
         categoryData[val] = null;
       }
     }
 
-    // create Category
-    Category.create(categoryData)
+    Category.create({ category: categoryData.category })
       .then(() => {
         resolve("Category added successfully");
       })
@@ -201,24 +220,6 @@ let deleteItemById = (id) => {
       });
   });
 };
-
-//create a data model of Item and Category
-const Item = sequelize.define("Item", {
-  body: Sequelize.TEXT,
-  title: Sequelize.STRING,
-  itemDate: Sequelize.DATE,
-  featureImage: Sequelize.STRING,
-  published: Sequelize.BOOLEAN,
-  price: Sequelize.DOUBLE,
-});
-
-// create a data model of Category
-const Category = sequelize.define("Category", {
-  category: Sequelize.STRING,
-});
-
-// create a relationship between Item and Category
-Item.belongsTo(Category, { foreignKey: "category" });
 
 // export the functions to be used in the server.js
 module.exports = {

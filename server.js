@@ -32,6 +32,7 @@ cloudinary.config({
 
 // set up multer for file uploads
 const upload = multer();
+
 //Middleware to parse URL-encoded data from form submission
 app.use(express.urlencoded({ extended: true }));
 
@@ -117,93 +118,75 @@ app.get("/about", (req, res) => {
 });
 
 app.get("/shop", async (req, res) => {
-  // Declare an object to store properties for the view
   let viewData = {};
 
   try {
-    // declare empty array to hold "item" objects
-    let items = [];
+    let items = []; // empty array for "items"
 
-    // if there's a "category" query, filter the returned items by category
     if (req.query.category) {
-      // Obtain the published "item" by category
       items = await storeService.getPublishedItemsByCategory(
         req.query.category
       );
+      //console.log(items);
     } else {
-      // Obtain the published "items"
       items = await storeService.getPublishedItems();
+      //console.log(items);
     }
 
     // sort the published items by itemDate
     items.sort((a, b) => new Date(b.itemDate) - new Date(a.itemDate));
 
-    // get the latest item from the front of the list (element 0)
-    let item = items[0];
-
-    // store the "items" and "item" data in the viewData object (to be passed to the view)
+    viewData.item = items[0];
     viewData.items = items;
-    viewData.item = item;
   } catch (err) {
-    viewData.message = "no results";
+    viewData.message = "no items results";
   }
 
   try {
     // Obtain the full list of "categories"
     let categories = await storeService.getCategories();
-    console.log(categories);
-    // store the "categories" data in the viewData object (to be passed to the view)
+    //console.log(categories);
     viewData.categories = categories;
   } catch (err) {
     console.error("Error fetching categories:", err);
-    viewData.categoriesMessage = "no results";
+    viewData.categoriesMessage = "no categories results";
   }
-
-  // render the "shop" view with all of the data (viewData)
   res.render("shop", { data: viewData });
 });
 
 // route to get the item that search by ID
 app.get("/shop/:id", async (req, res) => {
-  // Declare an object to store properties for the view
   let viewData = {};
 
   try {
-    // declare empty array to hold "item" objects
     let items = [];
 
     // if there's a "category" query, filter the returned items by category
     if (req.query.category) {
-      // Obtain the published "items" by category
       items = await storeService.getPublishedItemsByCategory(
         req.query.category
       );
     } else {
-      // Obtain the published "items"
       items = await storeService.getPublishedItems();
     }
 
     // sort the published items by itemDate
     items.sort((a, b) => new Date(b.itemDate) - new Date(a.itemDate));
 
-    // store the "items" and "item" data in the viewData object (to be passed to the view)
     viewData.items = items;
   } catch (err) {
     viewData.message = "no results";
   }
 
   try {
-    // Obtain the item by "id"
     viewData.item = await storeService.getItemById(req.params.id);
   } catch (err) {
     viewData.message = "no results";
   }
 
   try {
-    // Obtain the full list of "categories"
     let categories = await storeService.getCategories();
-    console.log(categories);
-    // store the "categories" data in the viewData object (to be passed to the view)
+    //console.log(categories);
     viewData.categories = categories;
   } catch (err) {
     console.error("Error fetching categories:", err);
@@ -234,6 +217,7 @@ app.get("/items", (req, res) => {
         res.render("items", { message: "No results" });
       });
   }
+
   // show items that search by minDate
   else if (req.query.minDate) {
     storeService
