@@ -21,6 +21,7 @@ const cloudinary = require("cloudinary").v2;
 const streamifier = require("streamifier");
 const exphbs = require("express-handlebars");
 const stripJs = require("strip-js");
+require("dotenv").config();
 
 // set cloudinary config
 cloudinary.config({
