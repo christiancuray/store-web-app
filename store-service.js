@@ -1,16 +1,7 @@
 const Sequelize = require("sequelize");
 const { Op } = require("sequelize");
 
-// connect to the database
-// const sequelize = new Sequelize("SenecaDB", "SenecaDB_owner", "Cv75rieDxWkg", {
-//   host: "ep-empty-shape-a5lkblz0.us-east-2.aws.neon.tech",
-//   dialect: "postgres",
-//   port: 5432,
-//   dialectOptions: {
-//     ssl: { rejectUnauthorized: false },
-//   },
-//   query: { raw: true },
-// });
+// create a connection to the database using my credentials
 const sequelize = new Sequelize(
   process.env.DATABASE_NAME || "SenecaDB",
   process.env.DATABASE_USER || "SenecaDB_owner",
@@ -30,6 +21,7 @@ const sequelize = new Sequelize(
   }
 );
 
+// create and define Item table
 const Item = sequelize.define("Item", {
   body: Sequelize.TEXT,
   title: Sequelize.STRING,
@@ -39,6 +31,7 @@ const Item = sequelize.define("Item", {
   price: Sequelize.DOUBLE,
 });
 
+// create and define Category table
 const Category = sequelize.define("Category", {
   category: Sequelize.STRING,
 });
@@ -109,9 +102,10 @@ let addItem = (itemData) => {
         itemData[val] = null;
       }
     }
-
+    // set the itemDate to the current date
     itemData.itemDate = new Date();
 
+    // create the item
     Item.create({
       title: itemData.title,
       body: itemData.body,
@@ -200,7 +194,7 @@ let addCategory = (categoryData) => {
         categoryData[val] = null;
       }
     }
-
+    // create the category
     Category.create({ category: categoryData.category })
       .then(() => {
         resolve("Category added successfully");

@@ -5,7 +5,7 @@ No part of this assignment has been copied manually or electronically from any o
 
 Name: Christian Daryl Curay
 Student ID: 122375231
-Date: November 12, 2024
+Date: November 26, 2024
 Vercel Web App URL: https://web-application-three-pi.vercel.app
 GitHub Repository URL: https://github.com/christiancuray/web-app
 
@@ -118,6 +118,7 @@ app.get("/about", (req, res) => {
   res.render("about");
 });
 
+// route to display shop page ( default page )
 app.get("/shop", async (req, res) => {
   let viewData = {};
 

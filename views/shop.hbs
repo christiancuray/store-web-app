@@ -1,12 +1,10 @@
 <div class="row">
   <section class="main col-md-9">
-    <!-- Check if the current item exists -->
     {{#if data.item}}
       <div class="item">
         <div class="row">
           <div class="col-4">
             <h2>{{data.item.title}}</h2>
-            <!-- Display the feature image -->
             <img
               src="{{data.item.featureImage}}"
               alt="Feature Image"
@@ -18,7 +16,6 @@
             <br /><br />
             <div class="row">
               <div class="col-12">
-                <!-- Display the item body with safeHTML helper -->
                 {{#safeHTML data.item.body}}{{/safeHTML}}
                 <br /><br />
                 <strong>Price:</strong> ${{data.item.price}}<br />
@@ -30,7 +27,6 @@
         </div>
       </div>
     {{else}}
-      <!-- If the item doesn't exist, show a message -->
       <div class="col-md-12 text-center">
         <h2>{{data.message}}</h2>
         <p>No Item available.</p>
@@ -41,7 +37,7 @@
   <aside class="col-md-3">
     <br /><br />
 
-    <!-- Items Section -->
+    <!-- Items -->
     {{#if data.items}} 
       <h4>Items</h4>
       <ul class="list-group">
@@ -56,7 +52,7 @@
       </ul>
     {{/if}}
 
-    <!-- Categories Section -->
+    <!-- Categories -->
     {{#if data.categories}}
       <h4>Categories</h4>
       <ul class="list-group">
