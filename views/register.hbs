@@ -1,0 +1,97 @@
+<div class="container" style="padding-top: 30px">
+  <div class="row">
+
+    <section class="main col-md-9">
+      <h2>Register</h2>
+
+      <!-- Error Message -->
+      {{#if errorMessage}}
+        <div class="alert alert-danger">
+          <strong>Error:</strong>
+          {{errorMessage}}
+        </div>
+      {{/if}}
+
+      <!-- Success Message -->
+      {{#if successMessage}}
+        <div class="alert alert-success">
+          <strong>Success:</strong>
+          {{successMessage}}
+        </div>
+      {{/if}}
+
+      <form method="post" action="/register">
+        <fieldset>
+          <br />
+          <!-- User Name -->
+          <div class="row">
+            <div class="col-md-12">
+              <div class="form-group">
+                <label for="userName">User Name</label>
+                <input
+                  class="form-control"
+                  id="userName"
+                  name="userName"
+                  type="username"
+                  value="{{userName}}"
+                  required
+                />
+              </div>
+            </div>
+          </div>
+          <!-- Password -->
+          <div class="row">
+            <div class="col-md-12">
+              <div class="form-group">
+                <label for="password">Password</label>
+                <input
+                  class="form-control"
+                  id="password"
+                  name="password"
+                  type="password"
+                  required
+                />
+              </div>
+            </div>
+          </div>
+          <!-- Confirm Password -->
+          <div class="row">
+            <div class="col-md-12">
+              <div class="form-group">
+                <label for="password2">Confirm Password</label>
+                <input
+                  class="form-control"
+                  id="password2"
+                  name="password2"
+                  type="password"
+                  required
+                />
+              </div>
+            </div>
+          </div>
+          <!-- Email -->
+          <div class="row">
+            <div class="col-md-12">
+              <div class="form-group">
+                <label for="email">Email Address</label>
+                <input
+                  class="form-control"
+                  id="email"
+                  name="email"
+                  type="email"
+                  required
+                />
+              </div>
+            </div>
+          </div>
+        </fieldset>
+        <hr />
+        <input
+          type="submit"
+          class="btn btn-primary pull-right"
+          value="Register"
+        /><br /><br /><br />
+      </form>
+    </section>
+  </div>
+</div>

@@ -1,0 +1,18 @@
+<div class=" container mt-5">
+    <h2>{{this.session.user.userName}} ({{this.session.user.email}}) History </h2>
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th scope="col">Login Date/Time</th>
+                <th scope="col">Client Information</th>
+            </tr>
+        </thead>
+        <tbody>
+            {{#each session.user.loginHistory}}
+            <tr>
+                <td>{{this.dateTime}}</td>
+                <td>{{this.userAgent}}</td>
+            </tr>
+            {{/each}}
+        </tbody>
+</div>

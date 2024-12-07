@@ -40,7 +40,7 @@ const Category = sequelize.define("Category", {
 Item.belongsTo(Category, { foreignKey: "category" });
 Category.hasMany(Item, { foreignKey: "category" });
 
-// function that reads the data from the items.json and categories.json files
+// function that reads the data from the database
 let initialize = () => {
   return new Promise((resolve, reject) => {
     sequelize

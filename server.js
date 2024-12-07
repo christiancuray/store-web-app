@@ -1,11 +1,11 @@
 /*********************************************************************************
-WEB322 – Assignment 05
+WEB322 – Assignment 06
 I declare that this assignment is my own work in accordance with Seneca Academic Policy.  
 No part of this assignment has been copied manually or electronically from any other source (including 3rd party web sites) or distributed to other students.
 
 Name: Christian Daryl Curay
 Student ID: 122375231
-Date: November 26, 2024
+Date: December 6, 2024
 Vercel Web App URL: https://web-application-three-pi.vercel.app
 GitHub Repository URL: https://github.com/christiancuray/web-app
 
@@ -21,6 +21,8 @@ const cloudinary = require("cloudinary").v2;
 const streamifier = require("streamifier");
 const exphbs = require("express-handlebars");
 const stripJs = require("strip-js");
+const authData = require("./auth-service");
+const clientSessions = require("client-sessions");
 require("dotenv").config();
 
 // set cloudinary config
@@ -36,6 +38,7 @@ const upload = multer();
 
 //Middleware to parse URL-encoded data from form submission
 app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
 
 // set up handlebars to render templates
 const hbs = exphbs.create({
@@ -96,6 +99,31 @@ storeService
     console.log(err);
   });
 
+// middleware to set up client-sessions
+app.use(
+  clientSessions({
+    cookieName: "session", // this is the object name that will be added to 'req'
+    secret: "8#jho#s23Gna2QXp!YzL4$wT5vK@p1mR", // this should be a long un-guessable string.
+    duration: 2 * 60 * 1000, // duration of the session in milliseconds (2 minutes)
+    activeDuration: 1000 * 60, // the session will be extended by this many ms each request (1 minute)
+  })
+);
+
+// middleware to set up session object
+app.use((req, res, next) => {
+  res.locals.session = req.session;
+  next();
+});
+
+// function to check if user is logged in or not
+function ensureLogin(req, res, next) {
+  if (!req.session.user) {
+    res.redirect("/login");
+  } else {
+    next();
+  }
+}
+
 // middleware to set activeRoute
 app.use(function (req, res, next) {
   let route = req.path.substring(1);
@@ -107,6 +135,10 @@ app.use(function (req, res, next) {
   app.locals.viewingCategory = req.query.category;
   next();
 });
+
+///////////////////////////////////////////////
+////       routes for about and shop       ////
+///////////////////////////////////////////////
 
 // route to redirect to shop page
 app.get("/", (req, res) => {
@@ -198,8 +230,62 @@ app.get("/shop/:id", async (req, res) => {
   res.render("shop", { data: viewData });
 });
 
+///////////////////////////////////////////////
+////         routes for categories         ////
+///////////////////////////////////////////////
+
+// route to get all categories
+app.get("/categories", ensureLogin, (req, res) => {
+  storeService
+    .getCategories()
+    .then((cat) => {
+      if (cat.length > 0) {
+        res.render("categories", { categories: cat });
+      } else {
+        res.render("categories", { message: "No results" });
+      }
+    })
+    .catch((error) => {
+      console.error("Error getting categories:", error);
+      res.render("categories", { message: "No results" });
+    });
+});
+
+// route to get the add category form
+app.get("/categories/add", ensureLogin, (req, res) => {
+  res.render("addCategory");
+});
+
+// route that handles the form submission
+app.post("/categories/add", ensureLogin, (req, res) => {
+  storeService
+    .addCategory(req.body)
+    .then(() => {
+      res.redirect("/categories");
+    })
+    .catch((error) => {
+      res.status(500).send("Error adding category");
+    });
+});
+
+// route to get the delete category by ID
+app.get("/categories/delete/:id", ensureLogin, (req, res) => {
+  storeService
+    .deleteCategoryById(req.params.id)
+    .then(() => {
+      res.redirect("/categories");
+    })
+    .catch((error) => {
+      res.status(500).send("Unable to Remove Category / Category not found");
+    });
+});
+
+///////////////////////////////////////////////
+////           routes for items            ////
+///////////////////////////////////////////////
+
 // route to get all items
-app.get("/items", (req, res) => {
+app.get("/items", ensureLogin, (req, res) => {
   // show items that search by category
   const category = req.query.category;
 
@@ -254,25 +340,8 @@ app.get("/items", (req, res) => {
     });
 });
 
-// route to get all categories
-app.get("/categories", (req, res) => {
-  storeService
-    .getCategories()
-    .then((cat) => {
-      if (cat.length > 0) {
-        res.render("categories", { categories: cat });
-      } else {
-        res.render("categories", { message: "No results" });
-      }
-    })
-    .catch((error) => {
-      console.error("Error getting categories:", error);
-      res.render("categories", { message: "No results" });
-    });
-});
-
 // route to get the add item form
-app.get("/items/add", (req, res) => {
+app.get("/items/add", ensureLogin, (req, res) => {
   storeService
     .getCategories()
     .then((data) => {
@@ -283,53 +352,58 @@ app.get("/items/add", (req, res) => {
     });
 });
 
-// route that handles the form submission
-app.post("/items/add", upload.single("featureImage"), (req, res) => {
-  let processItem = (imageUrl) => {
-    req.body.featureImage = imageUrl;
-    storeService
-      .addItem(req.body)
-      .then((addedItem) => {
-        console.log("Added Item:", addedItem);
-        res.redirect("/items");
-      })
-      .catch((error) => {
-        console.error("Error adding item:", error);
-        res.status(500).send("Error adding item");
-      });
-  };
-
-  if (req.file) {
-    let streamUpload = (req) => {
-      return new Promise((resolve, reject) => {
-        let stream = cloudinary.uploader.upload_stream((error, result) => {
-          if (result) {
-            resolve(result);
-          } else {
-            reject(error);
-          }
+// route that handles the add item form submission
+app.post(
+  "/items/add",
+  ensureLogin,
+  upload.single("featureImage"),
+  (req, res) => {
+    let processItem = (imageUrl) => {
+      req.body.featureImage = imageUrl;
+      storeService
+        .addItem(req.body)
+        .then((addedItem) => {
+          console.log("Added Item:", addedItem);
+          res.redirect("/items");
+        })
+        .catch((error) => {
+          console.error("Error adding item:", error);
+          res.status(500).send("Error adding item");
         });
-
-        streamifier.createReadStream(req.file.buffer).pipe(stream);
-      });
     };
 
-    async function upload(req) {
-      let result = await streamUpload(req);
-      console.log(result);
-      return result;
-    }
+    if (req.file) {
+      let streamUpload = (req) => {
+        return new Promise((resolve, reject) => {
+          let stream = cloudinary.uploader.upload_stream((error, result) => {
+            if (result) {
+              resolve(result);
+            } else {
+              reject(error);
+            }
+          });
 
-    upload(req).then((uploaded) => {
-      processItem(uploaded.url);
-    });
-  } else {
-    processItem("");
+          streamifier.createReadStream(req.file.buffer).pipe(stream);
+        });
+      };
+
+      async function upload(req) {
+        let result = await streamUpload(req);
+        console.log(result);
+        return result;
+      }
+
+      upload(req).then((uploaded) => {
+        processItem(uploaded.url);
+      });
+    } else {
+      processItem("");
+    }
   }
-});
+);
 
 // route to get the item that search by ID
-app.get("/item/value", (req, res) => {
+app.get("/item/value", ensureLogin, (req, res) => {
   // pass to itemValue variable
   const itemValue = req.params.value;
 
@@ -349,37 +423,8 @@ app.get("/item/value", (req, res) => {
     });
 });
 
-// route to get the add category form
-app.get("/categories/add", (req, res) => {
-  res.render("addCategory");
-});
-
-// route that handles the form submission
-app.post("/categories/add", (req, res) => {
-  storeService
-    .addCategory(req.body)
-    .then(() => {
-      res.redirect("/categories");
-    })
-    .catch((error) => {
-      res.status(500).send("Error adding category");
-    });
-});
-
-// route to get the delete category by ID
-app.get("/categories/delete/:id", (req, res) => {
-  storeService
-    .deleteCategoryById(req.params.id)
-    .then(() => {
-      res.redirect("/categories");
-    })
-    .catch((error) => {
-      res.status(500).send("Unable to Remove Category / Category not found");
-    });
-});
-
 // route to get the delete item by ID
-app.get("/items/delete/:id", (req, res) => {
+app.get("/items/delete/:id", ensureLogin, (req, res) => {
   storeService
     .deleteItemById(req.params.id)
     .then(() => {
@@ -390,12 +435,81 @@ app.get("/items/delete/:id", (req, res) => {
     });
 });
 
+///////////////////////////////////////////////
+////     routes for login and register     ////
+///////////////////////////////////////////////
+
+// route to login page
+app.get("/login", (req, res) => {
+  res.render("login");
+});
+
+// route to register page
+app.get("/register", (req, res) => {
+  res.render("register");
+});
+
+// route to handle registration form submission
+app.post("/register", (req, res) => {
+  authData
+    .registerUser(req.body)
+    .then(() => {
+      res.render("register", {
+        successMessage: "New user created successfully.",
+      });
+    })
+    .catch((err) => {
+      res.render("register", {
+        errorMessage: err,
+        userName: req.body.userName,
+      });
+    });
+});
+
+//route to handle login form submission
+app.post("/login", (req, res) => {
+  req.body.userAgent = req.get("User-Agent");
+
+  authData
+    .checkUser(req.body)
+    .then((user) => {
+      req.session.user = {
+        userName: user.userName,
+        email: user.email,
+        loginHistory: user.loginHistory,
+      };
+      res.redirect("/items");
+    })
+    .catch((err) => {
+      res.render("login", { errorMessage: err, userName: req.body.userName });
+    });
+});
+
+// route to handle logout
+app.get("/logout", (req, res) => {
+  req.session.reset();
+  res.redirect("/");
+});
+
+// route to display user history
+app.get("/userHistory", ensureLogin, (req, res) => {
+  res.render("userHistory");
+});
+
 // route to handle when trying to access a page that does not exist
 app.use((req, res) => {
   res.status(404).render("404");
 });
 
 // starts the server
-app.listen(port, () => {
-  console.log(`Express html server listening on http://localhost:${port}`);
-});
+storeService
+  .initialize()
+  .then(() => authData.initialize())
+  .then(() => {
+    app.listen(port, () => {
+      console.log(`App listening on: http://localhost:${port}`);
+    });
+  })
+  .catch((err) => {
+    console.error("Unable to start server:", err);
+  });

@@ -1,0 +1,59 @@
+<div class="container" style="padding-top: 30px">
+  <div class="row">
+
+    <section class="main col-md-9">
+      <h2>Log in</h2>
+
+      <!-- Error Message -->
+      {{#if errorMessage}}
+        <div class="alert alert-danger">
+          <strong>Error:</strong>
+          {{errorMessage}}
+        </div>
+      {{/if}}
+
+      <form method="post" action="/login">
+        <fieldset>
+          <br />
+          <!-- User Name -->
+          <div class="row">
+            <div class="col-md-12">
+              <div class="form-group">
+                <label for="userName">User Name</label>
+                <input
+                  class="form-control"
+                  id="userName"
+                  name="userName"
+                  type="text"
+                  value="{{userName}}"
+                  required
+                />
+              </div>
+            </div>
+          </div>
+          <!-- Password -->
+          <div class="row">
+            <div class="col-md-12">
+              <div class="form-group">
+                <label for="password">Password</label>
+                <input
+                  class="form-control"
+                  id="password"
+                  name="password"
+                  type="password"
+                  required
+                />
+              </div>
+            </div>
+          </div>
+        </fieldset>
+        <hr />
+        <input
+          type="submit"
+          class="btn btn-primary pull-right"
+          value="Login"
+        /><br /><br /><br />
+      </form>
+    </section>
+  </div>
+</div>
