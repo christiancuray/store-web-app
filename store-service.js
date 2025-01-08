@@ -1,5 +1,6 @@
 const Sequelize = require("sequelize");
 const { Op } = require("sequelize");
+require("pg");
 
 // create a connection to the database using my credentials
 const sequelize = new Sequelize(
