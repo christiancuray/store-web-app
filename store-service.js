@@ -1,18 +1,17 @@
 const Sequelize = require("sequelize");
 const { Op } = require("sequelize");
 require("pg");
+require("dotenv").config();
 
 // create a connection to the database using my credentials
 const sequelize = new Sequelize(
-  process.env.DATABASE_NAME || "SenecaDB",
-  process.env.DATABASE_USER || "SenecaDB_owner",
-  process.env.DATABASE_PASSWORD || "Cv75rieDxWkg",
+  process.env.DATABASE_NAME,
+  process.env.DATABASE_USER,
+  process.env.DATABASE_PASSWORD,
   {
-    host:
-      process.env.DATABASE_HOST ||
-      "ep-empty-shape-a5lkblz0.us-east-2.aws.neon.tech",
+    host: process.env.DATABASE_HOST,
     dialect: "postgres",
-    port: process.env.DATABASE_PORT || 5432,
+    port: process.env.DATABASE_PORT,
     dialectOptions: {
       ssl: {
         rejectUnauthorized: false,

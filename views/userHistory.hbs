@@ -1,18 +1,32 @@
-<div class=" container mt-5">
-    <h2>{{this.session.user.userName}} ({{this.session.user.email}}) History </h2>
-    <table class="table table-striped">
-        <thead>
-            <tr>
-                <th scope="col">Login Date/Time</th>
-                <th scope="col">Client Information</th>
-            </tr>
-        </thead>
-        <tbody>
-            {{#each session.user.loginHistory}}
-            <tr>
-                <td>{{this.dateTime}}</td>
-                <td>{{this.userAgent}}</td>
-            </tr>
-            {{/each}}
-        </tbody>
+<div class="container">
+  <div class="row">
+    <div class="col-md-12">
+      <h2>Login History</h2>
+      <hr />
+      {{#if session.user}}
+        <div class="table-responsive">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>Login Date/Time</th>
+                <th>User Agent</th>
+              </tr>
+            </thead>
+            <tbody>
+              {{#each session.user.loginHistory}}
+                <tr>
+                  <td>{{formatDateTime this.dateTime}}</td>
+                  <td>{{this.userAgent}}</td>
+                </tr>
+              {{/each}}
+            </tbody>
+          </table>
+        </div>
+      {{else}}
+        <div class="alert alert-danger">
+          <strong>No login history found!</strong>
+        </div>
+      {{/if}}
+    </div>
+  </div>
 </div>

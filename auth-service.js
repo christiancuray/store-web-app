@@ -1,48 +1,84 @@
 const mongoose = require("mongoose");
 const bcrypt = require("bcryptjs");
 const Schema = mongoose.Schema;
+require("dotenv").config();
+
+// Add this near the top of the file after the require statements
+console.log("MONGO_URI exists:", !!process.env.MONGO_URI);
+// DO NOT log the actual URI as it contains sensitive information
 
 // create a user schema
-let userSchema = new Schema({
-  userName: {
-    type: String,
-    unique: true,
-    required: true,
-  },
-  password: {
-    type: String,
-    required: true,
-  },
-  email: {
-    type: String,
-    required: true,
-  },
-  loginHistory: [
-    {
-      dateTime: {
-        type: Date,
-        required: true,
-      },
-      userAgent: {
-        type: String,
-        required: true,
-      },
+let userSchema = new Schema(
+  {
+    userName: {
+      type: String,
+      unique: true,
+      required: true,
     },
-  ],
-});
+    password: {
+      type: String,
+      required: true,
+    },
+    email: {
+      type: String,
+      required: true,
+    },
+    loginHistory: [
+      {
+        dateTime: {
+          type: Date,
+          required: true,
+          get: function (date) {
+            if (date) {
+              return date.toLocaleString("en-US", {
+                year: "numeric",
+                month: "2-digit",
+                day: "2-digit",
+                hour: "2-digit",
+                minute: "2-digit",
+                second: "2-digit",
+              });
+            }
+            return "";
+          },
+        },
+        userAgent: {
+          type: String,
+          required: true,
+        },
+      },
+    ],
+  },
+  { toJSON: { getters: true } }
+);
 
 let User; // to be defined on new connection
 
 // Initializes the connection to the database
 let initialize = () => {
   return new Promise((resolve, reject) => {
-    let db = mongoose.createConnection(
-      "mongodb+srv://curay404:christian16@dbs311.ynedt.mongodb.net/web"
-    );
-    db.on("error", (err) => {
-      reject("There was an error verifying the user: ", err.message);
+    if (!process.env.MONGO_URI) {
+      console.error("MONGO_URI is missing from environment variables");
+      reject("Error: MONGO_URI is not defined in environment variables");
+      return;
+    }
+
+    let db = mongoose.createConnection(process.env.MONGO_URI, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
     });
+
+    db.on("error", (err) => {
+      console.error("MongoDB Connection Error Details:", {
+        message: err.message,
+        code: err.code,
+        name: err.name,
+      });
+      reject("There was an error connecting to MongoDB: " + err.message);
+    });
+
     db.once("open", () => {
+      console.log("Successfully connected to MongoDB");
       User = db.model("users", userSchema);
       resolve();
     });
@@ -90,7 +126,7 @@ let registerUser = (userData) => {
           if (err.code == 11000) {
             reject("User Name already taken");
           } else {
-            reject("There was an error creating the user: ", err.message);
+            reject("There was an error creating the user: " + err.message);
           }
         });
     });

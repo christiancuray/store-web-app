@@ -28,8 +28,8 @@ require("dotenv").config();
 // set cloudinary config
 cloudinary.config({
   cloud_name: "dvdff6abc",
-  api_key: "125478299579294",
-  api_secret: "7V5OMnN0rcV4LABLXyEvB4Om_OY",
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
   secure: true,
 });
 
@@ -76,6 +76,17 @@ const hbs = exphbs.create({
       let day = dateObj.getDate().toString();
       return `${year}-${month.padStart(2, "0")}-${day.padStart(2, "0")}`;
     },
+    formatDateTime: function (dateTime) {
+      if (!dateTime) return "";
+      return new Date(dateTime).toLocaleString("en-US", {
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit",
+      });
+    },
   },
 });
 
@@ -103,7 +114,7 @@ storeService
 app.use(
   clientSessions({
     cookieName: "session", // this is the object name that will be added to 'req'
-    secret: "8#jho#s23Gna2QXp!YzL4$wT5vK@p1mR", // this should be a long un-guessable string.
+    secret: process.env.CLIENT_SESSION_SECRET, // this should be a long un-guessable string.
     duration: 2 * 60 * 1000, // duration of the session in milliseconds (2 minutes)
     activeDuration: 1000 * 60, // the session will be extended by this many ms each request (1 minute)
   })
@@ -287,13 +298,10 @@ app.get("/categories/delete/:id", ensureLogin, (req, res) => {
 // route to get all items
 app.get("/items", ensureLogin, (req, res) => {
   // show items that search by category
-  const category = req.query.category;
-
-  if (category) {
+  if (req.query.category) {
     storeService
-      .getItemsByCategory(category)
+      .getItemsByCategory(req.query.category)
       .then((items) => {
-        //return items in JSON format
         if (items.length > 0) {
           res.render("items", { items: items });
         } else {
@@ -305,13 +313,11 @@ app.get("/items", ensureLogin, (req, res) => {
         res.render("items", { message: "No results" });
       });
   }
-
   // show items that search by minDate
   else if (req.query.minDate) {
     storeService
       .getItemsByMinDate(req.query.minDate)
       .then((items) => {
-        //return items in JSON format
         if (items.length > 0) {
           res.render("items", { items: items });
         } else {
@@ -324,20 +330,21 @@ app.get("/items", ensureLogin, (req, res) => {
       });
   }
   // otherwise, return all items
-  storeService
-    .getAllItems()
-    .then((items) => {
-      // render all items in JSON format
-      if (items.length > 0) {
-        res.render("items", { items: items });
-      } else {
+  else {
+    storeService
+      .getAllItems()
+      .then((items) => {
+        if (items.length > 0) {
+          res.render("items", { items: items });
+        } else {
+          res.render("items", { message: "No results" });
+        }
+      })
+      .catch((error) => {
+        console.error("Error getting items:", error);
         res.render("items", { message: "No results" });
-      }
-    })
-    .catch((error) => {
-      console.error("Error getting items by category:", error);
-      res.render("items", { message: "No results" });
-    });
+      });
+  }
 });
 
 // route to get the add item form
@@ -411,8 +418,8 @@ app.get("/item/value", ensureLogin, (req, res) => {
     .getItemById(itemValue)
     .then((item) => {
       if (item) {
-        //return the item in JSON format
-        res.json;
+        // Fix: Send the actual item
+        res.json(item);
       } else {
         res.status(404).render("404");
       }
